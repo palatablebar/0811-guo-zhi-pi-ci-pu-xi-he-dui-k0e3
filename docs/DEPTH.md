@@ -11,6 +11,7 @@
 | M3 祖先追踪 | 查看业务计算结果 | `POST /api/stages/calculate` | `app/modules/calculate.py` | `tests/test_calculate.py` |
 | M4 投料平衡 | 查看签收判定 | `POST /api/stages/policy` | `app/modules/policy.py` | `tests/test_policy.py` |
 | M5 运行对账 | 对照输入、采信和隔离行 | `POST /api/stages/balance` | `app/modules/reconcile.py` | `tests/test_reconcile.py` |
+| M5b 跨批放行 | 汇总共享原料占用并停发超占批次 | `POST /api/stages/balance` | `app/modules/allocate.py` | `tests/test_allocate.py` |
 | M6 批次复核 | 执行批次并签发或暂缓 | `POST /api/runs、PATCH /api/runs/<id>` | `app/review/service.py` | `tests/test_review.py` |
 | M7 证据交付 | 下载复核清单 | `GET /api/runs/<id>/evidence` | `app/evidence/render.py` | `tests/test_evidence.py` |
 
@@ -35,3 +36,9 @@
 投料边指向原料批次。按拓扑顺序用精确比例传播克数，多路径汇总至同一原料批号。验证所有输入、输出和库存余额。
 
 逐组预期结论见 `tests/test_policy.py`，计算过程证据见 `tests/test_calculate.py`。
+
+## 跨批次放行
+
+同一原料批号可被多个业务组共同领用。同批号即同一物理原料批，可用量取各组申报库存的最大值；每组领用量为以该批号为源头的投料边克数之和。单组平衡不代表库存足够：把各组领用累计到批号上，超过可用量时所有领用组一并停发（`balance.blocked`），整批不可签发（`balance.releasable`），明细见 `balance.shared`。计算失败组的领用不计入占用，该组自身保持停发。
+
+放行结论随规则版本演进：源数据更新或规则升级都会重算出新批次；已签发批次的结论与证据冻结，未签发的受影响批次继续停发等待复核。同一内容重复执行命中同一批次，占用不重复累计；旧版与当前版依据均可经批次历史与复核证据追溯。

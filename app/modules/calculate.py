@@ -23,7 +23,7 @@ def compute(data):
         lineage[k] = source
     negative = sorted(k for k, v in issued.items() if v > nodes[k][1])
     result = lineage[check["batch"]]
-    return measured(
+    output = measured(
         nodes[check["batch"]][1],
         check["grams"],
         "克",
@@ -34,3 +34,12 @@ def compute(data):
         },
         bool(negative or imbalanced),
     )
+    output["stocks"] = {
+        str(k): nodes[k][1] for k in sorted(nodes) if nodes[k][0] == "stock"
+    }
+    output["draws"] = {
+        str(k): issued.get(k, 0)
+        for k in sorted(nodes)
+        if nodes[k][0] == "stock" and issued.get(k, 0) > 0
+    }
+    return output

@@ -8,7 +8,7 @@
 {% endmacro %}
 {% macro intake() %}
 <form class="source" id="source" aria-label="批次输入">
-  <label>输入样例 <select id="profile"><option value="dirty">带异常样例</option><option value="clean">可签发样例</option></select></label>
+  <label>输入样例 <select id="profile"><option value="dirty">带异常样例</option><option value="clean">可签发样例</option><option value="shared">共享原料样例</option></select></label>
   <label for="file" class="file">上传 CSV</label><input id="file" type="file" accept=".csv,text/csv"><span id="file-name" aria-live="polite"></span>
   <button type="submit" class="action">执行批次</button>
 </form>
@@ -24,6 +24,7 @@
 <section class="panel results" aria-labelledby="panel-title">
   <div class="panel-head"><h2 id="panel-title">运行对账</h2><span id="counts"></span></div>
   <div class="scroll"><table id="rows" aria-label="阶段结果"></table></div>
+  <div id="shared" class="shared" aria-label="跨批次放行结论"></div>
 </section>
 {% endmacro %}
 {% macro visual(p) %}
